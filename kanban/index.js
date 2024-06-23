@@ -65,13 +65,6 @@ removeBtn.addEventListener('click', (event) => {
         removeBtn.title="Disable Delete functionality";
         removeBtn.style.color='red';
         task_form.style.display='none'; // closing the task_form if it is open
-        
-        // || -------- remove ticket when clicked in DELETION Mode ------- || 
-        tickets = document.querySelectorAll('.ticket-container')
-        tickets.forEach(function(currentTicket) {
-            console.log(removeTaskFlag)
-            handleRemoval(currentTicket)
-        })
     }else{
         removeBtn.style.color='white';
         removeBtn.title="Enable Delete functionality";
@@ -100,8 +93,13 @@ function createTicketInDOM( task_value, ticket_status_color) {
     ticketContainer.innerHTML = ticketHTMLBody;
     console.log(ticketContainer) 
     mainDisplay.appendChild(ticketContainer);
+
+    // attaching events
+    handleLockClick(ticketContainer)
+    handleRemoval(ticketContainer)
 }
 
+// || -------- remove ticket when clicked in DELETION Mode ------- || 
 function handleRemoval( currentTicket ) {
     currentTicket.addEventListener('click', (e) => {
         if( removeTaskFlag ) {
@@ -112,16 +110,22 @@ function handleRemoval( currentTicket ) {
 }
 
 function handleLockClick( currentTicket ) {
-    const ticketText = currentTicket.querySelector('ticket-text')
-    const icon = currentTicket.querySelector('lock-icon').children[0];
+    const ticketText = currentTicket.querySelector('.ticket-text')
+    const icon = currentTicket.querySelector('.lock-icon').children[0];
 
-    icon.addEventListener('clicked', () => {
+    icon.addEventListener('click', () => {
         if( icon.classList.contains(lockClass) ) {
+            console.log(" ticket unlocked, ready to be edited")
+
             icon.classList.remove(lockClass)
             icon.classList.add(unlockClass)
+            ticketText.setAttribute('contenteditable',true);        
         } else{
+            console.log("ticket locked, can not be edited")
+            
             icon.classList.add(lockClass)
             icon.classList.remove(unlockClass)
+            ticketText.setAttribute('contenteditable',false)        
         }
     })
 }
