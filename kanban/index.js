@@ -10,8 +10,10 @@ let tickets = document.querySelectorAll('.ticket-container')
 let addTaskFlag = false;
 let removeTaskFlag = false;
 let taskId = 1;
-let ticket_status_color = 'light-blue' 
+let ticket_status_color = 'lightpink' 
 let lock_icon_clicked = false;
+const colorsList = ['lightblue', 'lightpink','lightgreen', 'black'];
+let index = 0;
 
 
 // || -------- adding toggle add button functionality ------- || 
@@ -77,7 +79,7 @@ function createTicketInDOM( task_value, ticket_status_color) {
     const ticketContainer = document.createElement('div');
     ticketContainer.classList.add('ticket-container');
 
-    const ticketHTMLBody = `<div class="${ticket_status_color}">Hello pls</div>
+    const ticketHTMLBody = `<div class="ticket-status-color" style="background-color: ${ticket_status_color}    "></div>
                                 <div class="ticket-unique-id">
                                     ${taskId}
                                 </div>
@@ -97,6 +99,7 @@ function createTicketInDOM( task_value, ticket_status_color) {
     // attaching events
     handleLockClick(ticketContainer)
     handleRemoval(ticketContainer)
+    changeTaskStatus(ticketContainer)
 }
 
 // || -------- remove ticket when clicked in DELETION Mode ------- || 
@@ -128,4 +131,18 @@ function handleLockClick( currentTicket ) {
             ticketText.setAttribute('contenteditable',false)        
         }
     })
+}
+
+function changeTaskStatus( currentTicket ) {
+    let statusColor = currentTicket.querySelector('div.ticket-status-color')
+    statusColor.addEventListener('click', () => {
+        let currentColor = statusColor.style.backgroundColor;
+
+        let currentColorIdx = colorsList.findIndex(function(color) {
+            return color == currentColor
+        })
+
+        let newIdx = (currentColorIdx + 1) % colorsList.length;
+        statusColor.style.backgroundColor=colorsList[newIdx]
+    })    
 }
