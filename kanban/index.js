@@ -3,11 +3,16 @@ const addBtn = document.querySelector('.add-task-btn');
 const removeBtn = document.querySelector('.remove-task-btn');
 const task_form = document.querySelector('.new-task-form');
 const task_status_colors = document.querySelectorAll('.color-selector')
+const lockClass = 'fa-lock'
+const unlockClass = 'fa-lock-open'
 
+let tickets = document.querySelectorAll('.ticket-container')
 let addTaskFlag = false;
 let removeTaskFlag = false;
 let taskId = 1;
 let ticket_status_color = 'light-blue' 
+let lock_icon_clicked = false;
+
 
 // || -------- adding toggle add button functionality ------- || 
 addBtn.addEventListener('click',( event ) => {
@@ -50,15 +55,23 @@ task_status_colors.forEach(function(currentColorElement){
     })
 })
 
-// || -------- adding remove tikcet from board functionality ------- || 
+// || -------- Activating DELETION Mode ------- || 
 removeBtn.addEventListener('click', (event) => {
     removeTaskFlag = !removeTaskFlag
 
     if( removeTaskFlag ) {
+        console.log(removeTaskFlag)
         alert("Delete Functionality Activated.");
         removeBtn.title="Disable Delete functionality";
         removeBtn.style.color='red';
         task_form.style.display='none'; // closing the task_form if it is open
+        
+        // || -------- remove ticket when clicked in DELETION Mode ------- || 
+        tickets = document.querySelectorAll('.ticket-container')
+        tickets.forEach(function(currentTicket) {
+            console.log(removeTaskFlag)
+            handleRemoval(currentTicket)
+        })
     }else{
         removeBtn.style.color='white';
         removeBtn.title="Enable Delete functionality";
@@ -71,7 +84,7 @@ function createTicketInDOM( task_value, ticket_status_color) {
     const ticketContainer = document.createElement('div');
     ticketContainer.classList.add('ticket-container');
 
-    const ticketHTMLBody = `<div class="${ticket_status_color}"></div>
+    const ticketHTMLBody = `<div class="${ticket_status_color}">Hello pls</div>
                                 <div class="ticket-unique-id">
                                     ${taskId}
                                 </div>
@@ -84,7 +97,31 @@ function createTicketInDOM( task_value, ticket_status_color) {
                                     </div>                
                             </div>`
                         
-    ticketContainer.innerHTML = ticketHTMLBody; 
+    ticketContainer.innerHTML = ticketHTMLBody;
+    console.log(ticketContainer) 
     mainDisplay.appendChild(ticketContainer);
-    // console.log(mainDisplay);
+}
+
+function handleRemoval( currentTicket ) {
+    currentTicket.addEventListener('click', (e) => {
+        if( removeTaskFlag ) {
+            console.log(currentTicket);
+            currentTicket.remove()
+        }
+    })
+}
+
+function handleLockClick( currentTicket ) {
+    const ticketText = currentTicket.querySelector('ticket-text')
+    const icon = currentTicket.querySelector('lock-icon').children[0];
+
+    icon.addEventListener('clicked', () => {
+        if( icon.classList.contains(lockClass) ) {
+            icon.classList.remove(lockClass)
+            icon.classList.add(unlockClass)
+        } else{
+            icon.classList.add(lockClass)
+            icon.classList.remove(unlockClass)
+        }
+    })
 }

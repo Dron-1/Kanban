@@ -82,31 +82,35 @@ body{
 }
 
 /* main diplay area */
-.main-display-area{
-    /* Testing */
+/* .main-display-area{
     position: relative;
-    /* Testing ends */
     margin-top: 1rem;
     display: grid;
     row-gap: 2rem;
     column-gap: 3rem;
     grid-template-columns: 20% 20% 20% 20%;
     justify-content: space-evenly;
+} */
+.main-display-area {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    gap:2rem;
+    margin-top: 2rem;
+    /* margin-left: 2rem; */
 }
-
 /* styling ticket containers */
 .ticket-container{
-    /* Testing */
-    /* position: absolute; */
-    /* Testing ends */
     display: flex;
-    height: 15rem;
+    height: 13rem;
+    width: 15rem;
     flex-direction: column;
     background-color: rgba(128, 0, 128, 0.29);
 }
 
 .ticket-status-color{
     background-color: lightblue;
+    height: 10%;
 }
 
 .ticket-unique-id{
