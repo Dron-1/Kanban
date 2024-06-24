@@ -10,12 +10,15 @@ const unlockClass = 'fa-lock-open'
 let tickets = document.querySelectorAll('.ticket-container')
 let addTaskFlag = false;
 let removeTaskFlag = false;
-let taskId = 1;
+// let taskId = 1;
 let ticket_status_color = 'lightpink' 
 let lock_icon_clicked = false;
 const colorsList = ['lightblue', 'lightpink','lightgreen', 'black'];
 let index = 0;
 
+// LS changes
+let ticketsList =[]
+init(); // calling init function to populate ticketeList
 
 // || -------- adding toggle add button functionality ------- || 
 addBtn.addEventListener('click',( event ) => {
@@ -33,9 +36,20 @@ addBtn.addEventListener('click',( event ) => {
 task_form.addEventListener('keyup', (event) => {
     if( event.key === 'Shift' ) {
         const task_text = document.querySelector('.task-text');
-        createTicketInDOM(task_text.value, ticket_status_color);
+
+        let taskId = Math.random().toString(36).substring(2);
+        createTicketInDOM(task_text.value, ticket_status_color,  taskId);
+
+        // || LS changes - started ||
+        ticketsList.push({
+            ticketId: taskId, 
+            ticketText: task_text.value, 
+            ticketStatusColor: ticket_status_color
+        })
+        updateLocalStorage(ticketsList)
+        // || LS changes - ended ||
+
         task_text.value="";
-        taskId ++;
         task_form.style.display='none';
         addTaskFlag=false;
     }
@@ -76,7 +90,7 @@ removeBtn.addEventListener('click', (event) => {
 
 
 // // helper functions
-function createTicketInDOM( task_value, ticket_status_color) {
+function createTicketInDOM( task_value, ticket_status_color, taskId) {
     const ticketContainer = document.createElement('div');
     ticketContainer.classList.add('ticket-container');
 
@@ -102,23 +116,43 @@ function createTicketInDOM( task_value, ticket_status_color) {
     handleRemoval(ticketContainer)
     changeTaskStatus(ticketContainer)
     handleFilterColor()
+
+
 }
 
 // || -------- remove ticket when clicked in DELETION Mode ------- || 
 function handleRemoval( currentTicket ) {
+    const ticketId = currentTicket.querySelector('.ticket-unique-id').innerText;
+    
     currentTicket.addEventListener('click', (e) => {
         if( removeTaskFlag ) {
             console.log(currentTicket);
-            currentTicket.remove()
+            currentTicket.remove();
+
+            // || LS changes - started ||
+            const taskidx_in_ticketList = getTicketIndex(ticketId);
+            ticketsList.splice(taskidx_in_ticketList, 1 );
+            // syntax: splice(idx to start from, number of elements to delete, elements to be added(optional) )
+            updateLocalStorage(ticketsList);
+            // || LS changes - ended ||
+
         }
     })
 }
 
 function handleLockClick( currentTicket ) {
+    console.log("Log from handleLockClick func: ",currentTicket);
     const ticketText = currentTicket.querySelector('.ticket-text')
     const icon = currentTicket.querySelector('.lock-icon').children[0];
+    // ticketId of ticket which got clicked
+    const ticketId = currentTicket.querySelector('.ticket-unique-id').innerText;
+    console.log("From handleLockClick func, ticket id of clicked ticket: ",ticketId);
+
 
     icon.addEventListener('click', () => {
+        const taskidx_in_ticketList = getTicketIndex(ticketId);
+        console.log("taskidx_in_ticketList: ", taskidx_in_ticketList);
+
         if( icon.classList.contains(lockClass) ) {
             console.log(" ticket unlocked, ready to be edited")
 
@@ -132,11 +166,19 @@ function handleLockClick( currentTicket ) {
             icon.classList.remove(unlockClass)
             ticketText.setAttribute('contenteditable',false)        
         }
+        // || LS changes - started ||
+        ticketsList[ taskidx_in_ticketList ].ticketText = ticketText.innerText;
+
+        // updating local storage
+        updateLocalStorage(ticketsList);
+        // || LS changes - ended ||
     })
 }
 
 function changeTaskStatus( currentTicket ) {
     let statusColor = currentTicket.querySelector('div.ticket-status-color')
+    const ticketId = currentTicket.querySelector('.ticket-unique-id').innerText;
+
     statusColor.addEventListener('click', () => {
         let currentColor = statusColor.style.backgroundColor;
         console.log(currentColor);
@@ -146,7 +188,15 @@ function changeTaskStatus( currentTicket ) {
         })
 
         let newIdx = (currentColorIdx + 1) % colorsList.length;
-        statusColor.style.backgroundColor=colorsList[newIdx]
+        statusColor.style.backgroundColor=colorsList[newIdx];
+
+        // || LS changes - started ||
+        const taskidx_in_ticketList = getTicketIndex(ticketId);
+        console.log("taskidx_in_ticketList: ", taskidx_in_ticketList);
+        ticketsList[ taskidx_in_ticketList ].ticketStatusColor = statusColor.style.backgroundColor;
+        // update LS
+        updateLocalStorage(ticketsList);
+        // || LS changes - ended ||
     })    
 }
 
@@ -177,3 +227,30 @@ function handleFilterColor() {
         })
     } )
 }
+
+// Local Storage Implementation
+function init() {
+    ticketsList = JSON.parse(localStorage.getItem('ticketsList')) || []
+    if( ticketsList.length > 0 ) {
+        ticketsList.forEach( function(ticket) {
+            createTicketInDOM(ticket.ticketText, ticket.ticketStatusColor, ticket.ticketId)
+        } )
+    }
+}
+
+function updateLocalStorage(ticketsList) {
+    localStorage.setItem('ticketsList', JSON.stringify(ticketsList))
+}
+
+// || ---- function for finding ticket index ---- ||
+function getTicketIndex(id) {
+    let idx = ticketsList.findIndex(function(ticket){
+        return ticket.ticketId == id; 
+    }) 
+    return idx;
+}
+// ticketsList.push({
+//     ticketId: taskId, 
+//     ticketText: task_text.value, 
+//     ticketStatusColor: ticket_status_color
+// })
