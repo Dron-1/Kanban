@@ -3,6 +3,7 @@ const addBtn = document.querySelector('.add-task-btn');
 const removeBtn = document.querySelector('.remove-task-btn');
 const task_form = document.querySelector('.new-task-form');
 const task_status_colors = document.querySelectorAll('.color-selector')
+const toolbarColors = document.querySelectorAll('.color') 
 const lockClass = 'fa-lock'
 const unlockClass = 'fa-lock-open'
 
@@ -100,6 +101,7 @@ function createTicketInDOM( task_value, ticket_status_color) {
     handleLockClick(ticketContainer)
     handleRemoval(ticketContainer)
     changeTaskStatus(ticketContainer)
+    handleFilterColor()
 }
 
 // || -------- remove ticket when clicked in DELETION Mode ------- || 
@@ -137,6 +139,7 @@ function changeTaskStatus( currentTicket ) {
     let statusColor = currentTicket.querySelector('div.ticket-status-color')
     statusColor.addEventListener('click', () => {
         let currentColor = statusColor.style.backgroundColor;
+        console.log(currentColor);
 
         let currentColorIdx = colorsList.findIndex(function(color) {
             return color == currentColor
@@ -145,4 +148,32 @@ function changeTaskStatus( currentTicket ) {
         let newIdx = (currentColorIdx + 1) % colorsList.length;
         statusColor.style.backgroundColor=colorsList[newIdx]
     })    
+}
+
+// | ---- filter tickets based on color ---- |
+function handleFilterColor() {
+    tickets = document.querySelectorAll('.ticket-container');
+    toolbarColors.forEach( function(color) {
+        color.addEventListener('click', () => {
+            const selectedColor = color.classList[0];
+            console.log("toolbar selected color: ", selectedColor)
+            tickets.forEach(function(ticket) {
+                let ticketStatusColor = ticket.querySelector('.ticket-status-color')
+                ticketStatusColor = ticketStatusColor.style.backgroundColor;
+                console.log(ticketStatusColor); 
+                if( ticketStatusColor === selectedColor ) {
+                    // color matches , display ticket
+                    ticket.style.display = 'flex';
+                } else{
+                    ticket.style.display = 'none';
+                }
+            })
+        })
+        //remove filter if any toolbar color double clicked
+        color.addEventListener('dblclick', () => {
+            tickets.forEach((ticket) => {
+              ticket.style.display = 'flex';  
+            })
+        })
+    } )
 }
