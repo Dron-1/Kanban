@@ -4,6 +4,7 @@ const removeBtn = document.querySelector('.remove-task-btn');
 const task_form = document.querySelector('.new-task-form');
 const task_status_colors = document.querySelectorAll('.color-selector')
 const toolbarColors = document.querySelectorAll('.color') 
+const noTasksDisplayMsg = document.querySelector('.no-tasks-display-msg')
 const lockClass = 'fa-lock'
 const unlockClass = 'fa-lock-open'
 
@@ -38,6 +39,14 @@ task_form.addEventListener('keyup', (event) => {
         const task_text = document.querySelector('.task-text');
 
         let taskId = Math.random().toString(36).substring(2);
+
+        // || new feature - handle no tickets to display ||
+        console.log(ticketsList)
+        if( ticketsList.length == 0) {
+            noTasksDisplayMsg.style.display='none'
+        }
+        // || new feature ends ||
+
         createTicketInDOM(task_text.value, ticket_status_color,  taskId);
 
         // || LS changes - started ||
@@ -109,15 +118,14 @@ function createTicketInDOM( task_value, ticket_status_color, taskId) {
                         
     ticketContainer.innerHTML = ticketHTMLBody;
     console.log(ticketContainer) 
-    mainDisplay.appendChild(ticketContainer);
 
+    mainDisplay.appendChild(ticketContainer);
+    console.log(mainDisplay)
     // attaching events
     handleLockClick(ticketContainer)
     handleRemoval(ticketContainer)
     changeTaskStatus(ticketContainer)
     handleFilterColor()
-
-
 }
 
 // || -------- remove ticket when clicked in DELETION Mode ------- || 
@@ -136,6 +144,12 @@ function handleRemoval( currentTicket ) {
             updateLocalStorage(ticketsList);
             // || LS changes - ended ||
 
+            // || new feature - handle no tickets to display ||
+            console.log('from handal removal', ticketsList)
+            if( ticketsList.length == 0) {
+                noTasksDisplayMsg.style.display='block'
+            }
+            // || new feature ends ||
         }
     })
 }
@@ -231,6 +245,11 @@ function handleFilterColor() {
 // Local Storage Implementation
 function init() {
     ticketsList = JSON.parse(localStorage.getItem('ticketsList')) || []
+    // || new feature - handle no tickets to display ||
+    if( ticketsList.length != 0) {
+        noTasksDisplayMsg.style.display='none'
+    }
+    // || new feature ends ||
     if( ticketsList.length > 0 ) {
         ticketsList.forEach( function(ticket) {
             createTicketInDOM(ticket.ticketText, ticket.ticketStatusColor, ticket.ticketId)
