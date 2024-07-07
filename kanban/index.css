@@ -16,6 +16,26 @@ body{
     align-items: center;
 }
 
+.headers{
+    position: absolute;
+    right: 2rem;
+}
+.headers a{
+    text-decoration: none;
+    color: white;
+    font-size: 1.2rem;
+    background-color: #424254;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px;
+}
+.headers h3, .page-heading{
+    color: white;
+    margin-left: 2rem;
+    font-size: 1.5rem;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
 .toolbar > * {
     display: flex;
     margin-left: 7rem;
